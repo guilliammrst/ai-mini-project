@@ -416,6 +416,22 @@ function renderTasks() {
 function renderUI() {
   renderCategories();
   renderTasks();
+  updateProgressBar();
+}
+
+function updateProgressBar() {
+  const totalTasks = AppState.tasks.length;
+  const completedTasks = AppState.tasks.filter((t) => t.completed).length;
+  const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
+
+  if (progressBar && progressText) {
+    progressBar.style.width = percentage + "%";
+    progressText.textContent = percentage + "% complété";
+    progressBar.parentElement.setAttribute("aria-valuenow", percentage);
+  }
 }
 
 // ========================================
