@@ -14,8 +14,37 @@
     <div class="container">
       <!-- Header -->
       <header class="header">
-        <h1 class="header__title">Ma TO-DO List</h1>
-        <p class="header__subtitle">Organisez vos tâches par catégories</p>
+        <div class="header__top">
+          <div>
+            <h1 class="header__title">Ma TO-DO List</h1>
+            <p class="header__subtitle">Organisez vos tâches par catégories</p>
+          </div>
+          <div class="header__actions" aria-label="Actions de sauvegarde">
+            <button
+              class="btn btn--icon"
+              id="export-btn"
+              aria-label="Exporter les données en JSON"
+              title="Exporter"
+            >
+              ⬇️
+            </button>
+            <button
+              class="btn btn--icon"
+              id="import-btn"
+              aria-label="Importer les données depuis un fichier JSON"
+              title="Importer"
+            >
+              ⬆️
+            </button>
+            <input
+              type="file"
+              id="import-file"
+              accept=".json"
+              style="display: none;"
+              aria-hidden="true"
+            />
+          </div>
+        </div>
       </header>
 
       <main class="main-content">

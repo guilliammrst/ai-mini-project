@@ -59,6 +59,13 @@ body {
   text-align: center;
 }
 
+.header__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
 .header__title {
   font-size: 2.5rem;
   font-weight: 700;
@@ -69,6 +76,12 @@ body {
   font-size: 1rem;
   opacity: 0.9;
   font-weight: 300;
+}
+
+.header__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
@@ -361,6 +374,28 @@ body {
 
 .btn--danger:hover {
   background: #f87171;
+}
+
+.btn--icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 6px;
+}
+
+.btn--icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn--icon:active {
+  transform: translateY(0);
 }
 
 /* ========================================

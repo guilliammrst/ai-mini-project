@@ -201,6 +201,83 @@ function getCategoryById(id) {
 }
 
 // ========================================
+// EXPORT / IMPORT FUNCTIONS
+// ========================================
+
+function exportData() {
+  try {
+    const data = {
+      categories: StorageManager.getCategories(),
+      tasks: StorageManager.getTasks(),
+      exportedAt: new Date().toISOString(),
+    };
+
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `todo-backup-${new Date().getTime()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    console.log("✅ Données exportées avec succès");
+  } catch (error) {
+    console.error("❌ Erreur lors de l'export :", error);
+    alert("Erreur lors de l'export des données");
+  }
+}
+
+function importData(file) {
+  if (!file) return;
+
+  try {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      try {
+        const content = e.target.result;
+        const data = JSON.parse(content);
+
+        // Validation de la structure
+        if (!data.categories || !data.tasks || !Array.isArray(data.categories) || !Array.isArray(data.tasks)) {
+          throw new Error("Structure JSON invalide");
+        }
+
+        // Sauvegarde des données
+        StorageManager.saveCategories(data.categories);
+        StorageManager.saveTasks(data.tasks);
+
+        // Mise à jour de l'AppState
+        AppState.categories = data.categories;
+        AppState.tasks = data.tasks;
+
+        // Rafraîchir l'interface
+        renderUI();
+
+        console.log("✅ Données importées avec succès");
+        alert("Données importées avec succès !");
+      } catch (parseError) {
+        console.error("❌ Erreur lors du parsing JSON :", parseError);
+        alert("Fichier JSON invalide. Vérifiez le format.");
+      }
+    };
+
+    reader.onerror = function () {
+      console.error("❌ Erreur lors de la lecture du fichier");
+      alert("Impossible de lire le fichier");
+    };
+
+    reader.readAsText(file);
+  } catch (error) {
+    console.error("❌ Erreur lors de l'import :", error);
+    alert("Erreur lors de l'import des données");
+  }
+}
+
+// ========================================
 // DOM ELEMENTS
 // ========================================
 
@@ -227,6 +304,11 @@ const DOM = {
   // Filters
   filterCategory: document.getElementById("filter-category"),
   filterStatus: document.getElementById("filter-status"),
+
+  // Storage Actions
+  exportBtn: document.getElementById("export-btn"),
+  importBtn: document.getElementById("import-btn"),
+  importFileInput: document.getElementById("import-file"),
 };
 
 // ========================================
@@ -520,6 +602,17 @@ function init() {
   DOM.addTaskBtn.addEventListener("click", handleAddTaskClick);
   DOM.cancelTaskBtn.addEventListener("click", handleCancelTaskClick);
   DOM.taskForm.addEventListener("submit", handleTaskFormSubmit);
+
+  // Export / Import listeners
+  DOM.exportBtn.addEventListener("click", exportData);
+  DOM.importBtn.addEventListener("click", function () {
+    DOM.importFileInput.click();
+  });
+  DOM.importFileInput.addEventListener("change", function (e) {
+    importData(e.target.files[0]);
+    // Reset input so the same file can be imported again
+    e.target.value = "";
+  });
 
   // Initial render
   renderUI();
