@@ -4,7 +4,7 @@ Une application web moderne de gestion de tâches avec système de catégories, 
 
 ![Badge Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
 ![Badge License](https://img.shields.io/badge/license-MIT-blue)
-![Badge Version](https://img.shields.io/badge/version-1.4.0-blue)
+![Badge Version](https://img.shields.io/badge/version-1.5.0-blue)
 
 ---
 
@@ -17,15 +17,17 @@ Une application web moderne de gestion de tâches avec système de catégories, 
 - ✅ Actions rapides (édition, suppression)
 
 ### 📝 Gestion des Tâches
-- ✅ Créer des tâches avec titre, catégorie et date d'échéance
-- ✅ Marquer les tâches comme "À faire" ou "Terminées"
+- ✅ Créer des tâches avec titre, catégorie, priorité et date d'échéance
+- ✅ Marquer les tâches comme "À faire", "En cours" ou "Terminée"
 - ✅ Détecter automatiquement les tâches dépassées
 - ✅ Éditer et supprimer les tâches
 - ✅ Affichage dynamique avec badges de catégories
 
 ### 🔍 Filtres & Recherche
 - ✅ Filtrer par catégorie
-- ✅ Filtrer par statut (Toutes / À faire / Terminées)
+- ✅ Filtrer par statut
+- ✅ Filtrer par texte
+- ✅ Filtrer par priorité
 - ✅ Combinaison des filtres en temps réel
 - ✅ État des filtres conservé lors de la navigation
 
@@ -118,11 +120,6 @@ http://localhost:8000
 - **Éditer**: Cliquez sur le bouton ✎
 - **Supprimer**: Cliquez sur le bouton ✕ et confirmez
 
-### Utiliser les Filtres
-- **Filtre par catégorie**: Sélectionnez dans le dropdown "Catégorie"
-- **Filtre par statut**: Sélectionnez "À faire" ou "Terminées"
-- **Combiner les filtres**: Les deux filtres fonctionnent ensemble
-
 ### Gérer les Catégories
 - **Éditer**: Cliquez sur ✎ → Entrez le nouveau nom
 - **Supprimer**: Cliquez sur ✕ → Confirmez ⚠️
@@ -135,11 +132,14 @@ http://localhost:8000
 ### Structure des Fichiers
 ```
 ai-mini-project/
+├── .agents/skills/     # Skills essentiels au projet
+├── CONTEXT.md          # Contexte du projet
 ├── index.html          # Markup HTML5 sémantique
 ├── style.css           # CSS3 modulaire et responsive
 ├── script.js           # Logique JavaScript ES6+
 ├── README.md           # Ce fichier
 └── skills-lock.json    # Métadonnées des skills
+└── import-tasks.json   # Import de tâches pour faciliter les tests
 ```
 
 ### Architecture JavaScript
@@ -200,7 +200,7 @@ handleFilterChange()      // Applique les filtres
 {
   id: "1708975234567",          // Timestamp unique
   name: "Travail",              // Nom de la catégorie
-  color: "#667eea"              // Couleur hexadécimale
+  color: "#667eea"            // Couleur hexadécimale
 }
 ```
 
@@ -208,10 +208,11 @@ handleFilterChange()      // Applique les filtres
 ```javascript
 {
   id: "1708975234568",          // Timestamp unique
-  title: "Terminer le rapport",  // Titre de la tâche
-  categoryId: "1708975234567",   // Référence de catégorie
-  deadline: "2026-03-15",        // Date d'échéance (ISO 8601)
-  completed: false,              // Statut
+  title: "Terminer le rapport", // Titre de la tâche
+  categoryId: "1708975234567",  // Référence de catégorie
+  deadline: "2026-03-15",       // Date d'échéance (ISO 8601)
+  status: "in-progress",        // Status 
+  priority: "hot",              // Priorité
   createdAt: "2026-02-27T..."   // Date de création (ISO 8601)
 }
 ```
@@ -305,6 +306,7 @@ Vous avez trouvé un bug ? Créez une issue avec:
 - [ ] Synchronisation cloud (Firebase, Supabase)
 - [x] Export en CSV/JSON
 - [x] Recherche full-text dans les tâches
+- [x] Ajout priorité des tâches
 - [ ] Sous-tâches/Hierarchie
 
 ### Moyen Terme
@@ -371,4 +373,4 @@ Merci d'utiliser cette application TO-DO List. Vos retours et suggestions d'amé
 ---
 
 **Dernière mise à jour** : 27 février 2026  
-**Version stable** : 1.4.0
+**Version stable** : 1.5.0

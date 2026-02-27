@@ -23,15 +23,17 @@
       "categoryId": "1800000000001",
       "deadline": "2026-03-01",
       "status": "in-progress",
+      "priority": "hot",
       "createdAt": "2026-02-27T10:00:00.000Z"
     },
     {
       "id": "1800000000102",
-      "title": "Implémenter la recherche textuelle",
+      "title": "Corriger le bug critique sur la prod",
       "categoryId": "1800000000001",
-      "deadline": "2026-02-28",
-      "status": "done",
-      "createdAt": "2026-02-27T09:30:00.000Z"
+      "deadline": "2026-02-27",
+      "status": "todo",
+      "priority": "urgent",
+      "createdAt": "2026-02-27T10:05:00.000Z"
     },
     {
       "id": "1800000000103",
@@ -39,6 +41,7 @@
       "categoryId": "1800000000002",
       "deadline": "2026-03-02",
       "status": "todo",
+      "priority": "normal",
       "createdAt": "2026-02-27T10:15:00.000Z"
     },
     {
@@ -47,6 +50,7 @@
       "categoryId": "1800000000003",
       "deadline": "2026-02-27",
       "status": "in-progress",
+      "priority": "low",
       "createdAt": "2026-02-27T08:00:00.000Z"
     },
     {
@@ -55,6 +59,7 @@
       "categoryId": "1800000000003",
       "deadline": "2026-03-05",
       "status": "todo",
+      "priority": "normal",
       "createdAt": "2026-02-27T10:20:00.000Z"
     },
     {
@@ -62,7 +67,8 @@
       "title": "Pousser la v1.4.0 sur GitHub",
       "categoryId": "1800000000001",
       "deadline": "2026-03-03",
-      "status": "todo",
+      "status": "done",
+      "priority": "normal",
       "createdAt": "2026-02-27T10:25:00.000Z"
     }
   ],

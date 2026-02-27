@@ -37,7 +37,20 @@ const StorageManager = {
   getTasks() {
     try {
       const data = localStorage.getItem(this.STORAGE_KEYS.TASKS);
-      return data ? JSON.parse(data) : [];
+      let tasks = data ? JSON.parse(data) : [];
+      
+      // Migration: Add priority to old tasks
+      tasks = tasks.map((task) => ({
+        ...task,
+        priority: task.priority || "normal", // Default to 'normal' if missing
+      }));
+      
+      // Re-save migrated tasks
+      if (tasks.length > 0 && tasks.some((t) => !data.includes('"priority"'))) {
+        this.saveTasks(tasks);
+      }
+      
+      return tasks;
     } catch (error) {
       console.error("Error reading tasks from storage:", error);
       return [];
@@ -63,6 +76,7 @@ const AppState = {
   filters: {
     category: "",
     status: "",
+    priority: "",
     search: "",
   },
 
@@ -95,7 +109,7 @@ const AppState = {
     }
   },
 
-  addTask(title, categoryId, deadline) {
+  addTask(title, categoryId, deadline, priority = "normal") {
     const id = Date.now().toString();
     const task = {
       id,
@@ -103,6 +117,7 @@ const AppState = {
       categoryId,
       deadline: deadline || null,
       status: "todo",
+      priority: priority, // Add priority level
       createdAt: new Date().toISOString(),
     };
     this.tasks.push(task);
@@ -137,21 +152,27 @@ const AppState = {
   },
 
   getFilteredTasks() {
-    return this.tasks.filter((task) => {
+    const filtered = this.tasks.filter((task) => {
       const categoryMatch =
         !this.filters.category || task.categoryId === this.filters.category;
       const statusMatch =
         !this.filters.status || task.status === this.filters.status;
+      const priorityMatch =
+        !this.filters.priority || task.priority === this.filters.priority;
       const searchMatch =
         !this.filters.search ||
         task.title.toLowerCase().includes(this.filters.search.toLowerCase());
-      return categoryMatch && statusMatch && searchMatch;
+      return categoryMatch && statusMatch && priorityMatch && searchMatch;
     });
+    
+    // Sort by priority
+    return sortTasksByPriority(filtered);
   },
 
-  setFilters(category, status, search) {
+  setFilters(category, status, search, priority) {
     this.filters.category = category;
     this.filters.status = status;
+    this.filters.priority = priority;
     this.filters.search = search || this.filters.search;
   },
 };
@@ -201,6 +222,39 @@ function isOverdue(dateString) {
 
 function getCategoryById(id) {
   return AppState.categories.find((c) => c.id === id);
+}
+
+function getPriorityOrder(priority) {
+  const order = { urgent: 0, hot: 1, normal: 2, low: 3 };
+  return order[priority] ?? 2; // Default to 'normal' (2) if unknown
+}
+
+function sortTasksByPriority(tasks) {
+  return [...tasks].sort((a, b) => {
+    // First, sort by priority (ascending order index)
+    const priorityDiff = getPriorityOrder(a.priority) - getPriorityOrder(b.priority);
+    if (priorityDiff !== 0) return priorityDiff;
+    
+    // If same priority, sort by creation date (newest first)
+    const createdDiff = new Date(b.createdAt) - new Date(a.createdAt);
+    if (createdDiff !== 0) return createdDiff;
+    
+    // If same creation date, sort by deadline (earliest first, nullable)
+    if (a.deadline && b.deadline) {
+      return new Date(a.deadline) - new Date(b.deadline);
+    }
+    return a.deadline ? -1 : 1; // Tasks with deadline first
+  });
+}
+
+function getPriorityIcon(priority) {
+  const icons = {
+    low: "📍",
+    normal: "➖",
+    hot: "🔥",
+    urgent: "⚠️",
+  };
+  return icons[priority] || "➖";
 }
 
 // ========================================
@@ -294,10 +348,17 @@ const DOM = {
   // Forms
   categoryForm: document.getElementById("category-form"),
   taskForm: document.getElementById("task-form"),
+  editTaskForm: document.getElementById("edit-task-form"),
   categoryNameInput: document.getElementById("category-name"),
   taskTitleInput: document.getElementById("task-title"),
   taskCategorySelect: document.getElementById("task-category"),
   taskDeadlineInput: document.getElementById("task-deadline"),
+  taskPrioritySelect: document.getElementById("task-priority"),
+  editTaskTitleInput: document.getElementById("edit-task-title"),
+  editTaskCategorySelect: document.getElementById("edit-task-category"),
+  editTaskDeadlineInput: document.getElementById("edit-task-deadline"),
+  editTaskPrioritySelect: document.getElementById("edit-task-priority"),
+  cancelEditTaskBtn: document.getElementById("cancel-edit-task-btn"),
 
   // Lists & Containers
   categoriesList: document.getElementById("categories-list"),
@@ -308,12 +369,19 @@ const DOM = {
   searchInput: document.getElementById("search-input"),
   filterCategory: document.getElementById("filter-category"),
   filterStatus: document.getElementById("filter-status"),
+  filterPriority: document.getElementById("filter-priority"),
 
   // Storage Actions
   exportBtn: document.getElementById("export-btn"),
   importBtn: document.getElementById("import-btn"),
   importFileInput: document.getElementById("import-file"),
 };
+
+// ========================================
+// EDIT STATE
+// ========================================
+
+let editingTaskId = null;
 
 // ========================================
 // RENDER FUNCTIONS
@@ -354,6 +422,16 @@ function renderCategories() {
     option.value = category.id;
     option.textContent = category.name;
     DOM.taskCategorySelect.appendChild(option);
+  });
+
+  // Update edit task category select
+  DOM.editTaskCategorySelect.innerHTML =
+    '<option value="">-- Choisir une catégorie --</option>';
+  AppState.categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.name;
+    DOM.editTaskCategorySelect.appendChild(option);
   });
 
   // Update filter category select
@@ -413,6 +491,9 @@ function renderTasks() {
       <div class="task-content">
         <div class="task-title">${escapeHtml(task.title)}</div>
         <div class="task-meta">
+          <span class="priority-badge priority-badge--${task.priority}" aria-label="Priorité: ${task.priority}" title="${task.priority}">
+            ${getPriorityIcon(task.priority)}
+          </span>
           ${category ? `<span class="task-category-badge" style="background-color: ${category.color}20; color: ${category.color}; border: 1px solid ${category.color}40;">${escapeHtml(category.name)}</span>` : ""}
           ${deadlineHtml}
         </div>
@@ -496,6 +577,7 @@ function handleCancelTaskClick() {
   DOM.taskTitleInput.value = "";
   DOM.taskCategorySelect.value = "";
   DOM.taskDeadlineInput.value = "";
+  DOM.taskPrioritySelect.value = "normal";
 }
 
 function handleTaskFormSubmit(e) {
@@ -503,6 +585,7 @@ function handleTaskFormSubmit(e) {
   const title = DOM.taskTitleInput.value.trim();
   const categoryId = DOM.taskCategorySelect.value;
   const deadline = DOM.taskDeadlineInput.value;
+  const priority = DOM.taskPrioritySelect.value;
 
   if (!title) {
     alert("Le titre de la tâche ne peut pas être vide.");
@@ -514,10 +597,11 @@ function handleTaskFormSubmit(e) {
     return;
   }
 
-  AppState.addTask(title, categoryId, deadline);
+  AppState.addTask(title, categoryId, deadline, priority);
   DOM.taskTitleInput.value = "";
   DOM.taskCategorySelect.value = "";
   DOM.taskDeadlineInput.value = "";
+  DOM.taskPrioritySelect.value = "normal";
   DOM.taskForm.hidden = true;
   renderUI();
 }
@@ -551,15 +635,75 @@ function handleTaskAction(action, id) {
       renderUI();
     }
   } else if (action === "edit-task") {
-    const task = AppState.tasks.find((t) => t.id === id);
-    if (task) {
-      const newTitle = prompt("Nouveau titre de tâche:", task.title);
-      if (newTitle && newTitle.trim()) {
-        AppState.updateTask(id, { title: newTitle.trim() });
-        renderUI();
-      }
-    }
+    handleOpenEditTask(id);
   }
+}
+
+function handleOpenEditTask(id) {
+  const task = AppState.tasks.find((t) => t.id === id);
+  if (!task) return;
+
+  editingTaskId = id;
+  
+  // Ensure category select options are up-to-date
+  DOM.editTaskCategorySelect.innerHTML =
+    '<option value="">-- Choisir une catégorie --</option>';
+  AppState.categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.name;
+    DOM.editTaskCategorySelect.appendChild(option);
+  });
+
+  // Pre-fill form with current task data
+  DOM.editTaskTitleInput.value = task.title;
+  DOM.editTaskCategorySelect.value = task.categoryId;
+  DOM.editTaskDeadlineInput.value = task.deadline || "";
+  DOM.editTaskPrioritySelect.value = task.priority;
+
+  // Show edit form
+  DOM.editTaskForm.hidden = false;
+  DOM.editTaskTitleInput.focus();
+}
+
+function handleCancelEditTask() {
+  DOM.editTaskForm.hidden = true;
+  editingTaskId = null;
+  DOM.editTaskTitleInput.value = "";
+  DOM.editTaskCategorySelect.value = "";
+  DOM.editTaskDeadlineInput.value = "";
+  DOM.editTaskPrioritySelect.value = "normal";
+}
+
+function handleEditTaskFormSubmit(e) {
+  e.preventDefault();
+  
+  if (!editingTaskId) return;
+
+  const title = DOM.editTaskTitleInput.value.trim();
+  const categoryId = DOM.editTaskCategorySelect.value;
+  const deadline = DOM.editTaskDeadlineInput.value;
+  const priority = DOM.editTaskPrioritySelect.value;
+
+  if (!title) {
+    alert("Le titre de la tâche ne peut pas être vide.");
+    return;
+  }
+
+  if (!categoryId) {
+    alert("Veuillez sélectionner une catégorie.");
+    return;
+  }
+
+  AppState.updateTask(editingTaskId, {
+    title,
+    categoryId,
+    deadline: deadline || null,
+    priority,
+  });
+
+  handleCancelEditTask();
+  renderUI();
 }
 
 function handleTaskStatusChange(id, newStatus) {
@@ -571,7 +715,8 @@ function handleFilterChange() {
   const category = DOM.filterCategory.value;
   const status = DOM.filterStatus.value;
   const search = DOM.searchInput.value;
-  AppState.setFilters(category, status, search);
+  const priority = DOM.filterPriority.value;
+  AppState.setFilters(category, status, search, priority);
   renderTasks();
 }
 
@@ -612,7 +757,7 @@ document.addEventListener("change", (e) => {
   }
 
   // Filters
-  if (target === DOM.filterCategory || target === DOM.filterStatus) {
+  if (target === DOM.filterCategory || target === DOM.filterStatus || target === DOM.filterPriority) {
     handleFilterChange();
   }
 });
@@ -651,6 +796,10 @@ function init() {
   DOM.cancelTaskBtn.addEventListener("click", handleCancelTaskClick);
   DOM.taskForm.addEventListener("submit", handleTaskFormSubmit);
 
+  // Edit task form listeners
+  DOM.editTaskForm.addEventListener("submit", handleEditTaskFormSubmit);
+  DOM.cancelEditTaskBtn.addEventListener("click", handleCancelEditTask);
+
   // Export / Import listeners
   DOM.exportBtn.addEventListener("click", exportData);
   DOM.importBtn.addEventListener("click", function () {
@@ -671,6 +820,9 @@ function init() {
   }
   if (AppState.filters.status) {
     DOM.filterStatus.value = AppState.filters.status;
+  }
+  if (AppState.filters.priority) {
+    DOM.filterPriority.value = AppState.filters.priority;
   }
   if (AppState.filters.search) {
     DOM.searchInput.value = AppState.filters.search;

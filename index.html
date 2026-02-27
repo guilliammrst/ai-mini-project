@@ -137,6 +137,23 @@
                 <option value="done">Terminées</option>
               </select>
             </div>
+
+            <div class="filter-group">
+              <label for="filter-priority" class="label label--small">
+                Priorité
+              </label>
+              <select
+                id="filter-priority"
+                class="input input--select"
+                aria-label="Filtrer par priorité"
+              >
+                <option value="">Toutes les priorités</option>
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="hot">Hot</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
           </section>
 
         </aside>
@@ -222,6 +239,20 @@
                 </div>
               </div>
 
+              <div class="form-group">
+                <label for="task-priority" class="label">Priorité</label>
+                <select
+                  id="task-priority"
+                  class="input input--select"
+                  aria-label="Sélectionner la priorité de la tâche"
+                >
+                  <option value="low">Low</option>
+                  <option value="normal" selected>Normal</option>
+                  <option value="hot">Hot</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+
               <div class="form-actions">
                 <button type="submit" class="btn btn--primary">
                   Créer la tâche
@@ -230,6 +261,77 @@
                   type="button"
                   class="btn btn--secondary"
                   id="cancel-task-btn"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+
+            <!-- Form Édition Tâche (caché par défaut) -->
+            <form
+              class="task-form"
+              id="edit-task-form"
+              hidden
+              aria-label="Formulaire d'édition de tâche"
+            >
+              <div class="form-group">
+                <label for="edit-task-title" class="label">Titre</label>
+                <input
+                  type="text"
+                  id="edit-task-title"
+                  class="input input--text"
+                  placeholder="Décrivez votre tâche..."
+                  required
+                  maxlength="100"
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="edit-task-category" class="label">Catégorie</label>
+                  <select
+                    id="edit-task-category"
+                    class="input input--select"
+                    required
+                    aria-label="Sélectionner une catégorie"
+                  >
+                    <option value="">-- Choisir --</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="edit-task-deadline" class="label">Date d'échéance</label>
+                  <input
+                    type="date"
+                    id="edit-task-deadline"
+                    class="input input--date"
+                    aria-label="Sélectionner une date d'échéance"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="edit-task-priority" class="label">Priorité</label>
+                <select
+                  id="edit-task-priority"
+                  class="input input--select"
+                  aria-label="Sélectionner la priorité de la tâche"
+                >
+                  <option value="low">Low</option>
+                  <option value="normal">Normal</option>
+                  <option value="hot">Hot</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn--primary">
+                  Mettre à jour
+                </button>
+                <button
+                  type="button"
+                  class="btn btn--secondary"
+                  id="cancel-edit-task-btn"
                 >
                   Annuler
                 </button>
