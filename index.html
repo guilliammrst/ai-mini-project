@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Application de gestion de tâches organisée par catégories"
+    />
+    <title>TO-DO List - Gérez vos tâches par catégories</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <h1 class="header__title">Ma TO-DO List</h1>
+        <p class="header__subtitle">Organisez vos tâches par catégories</p>
+      </header>
+
+      <main class="main-content">
+        <!-- Section Catégories -->
+        <section class="categories-section" aria-labelledby="categories-title">
+          <div class="section-header">
+            <h2 id="categories-title" class="section-title">Catégories</h2>
+            <button
+              class="btn btn--primary btn--small"
+              id="add-category-btn"
+              aria-label="Ajouter une nouvelle catégorie"
+            >
+              + Ajouter
+            </button>
+          </div>
+
+          <div class="categories-list" id="categories-list" role="list">
+            <!-- Les catégories seront générées ici par JavaScript -->
+          </div>
+
+          <!-- Form Ajout Catégorie (caché par défaut) -->
+          <form
+            class="category-form"
+            id="category-form"
+            hidden
+            aria-label="Formulaire d'ajout de catégorie"
+          >
+            <div class="form-group">
+              <label for="category-name" class="label">Nom de la catégorie</label>
+              <input
+                type="text"
+                id="category-name"
+                class="input input--text"
+                placeholder="Ex: Travail, Personnel..."
+                required
+                maxlength="30"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn--primary">
+                Créer
+              </button>
+              <button
+                type="button"
+                class="btn btn--secondary"
+                id="cancel-category-btn"
+              >
+                Annuler
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Divider -->
+        <hr class="divider" />
+
+        <!-- Section Tâches -->
+        <section class="tasks-section" aria-labelledby="tasks-title">
+          <div class="section-header">
+            <h2 id="tasks-title" class="section-title">Tâches</h2>
+            <button
+              class="btn btn--primary btn--small"
+              id="add-task-btn"
+              aria-label="Ajouter une nouvelle tâche"
+            >
+              + Ajouter
+            </button>
+          </div>
+
+          <!-- Filtres -->
+          <div class="filters" role="group" aria-label="Filtres des tâches">
+            <div class="filter-group">
+              <label for="filter-category" class="label label--small">
+                Catégorie
+              </label>
+              <select
+                id="filter-category"
+                class="input input--select"
+                aria-label="Filtrer par catégorie"
+              >
+                <option value="">Toutes les catégories</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-status" class="label label--small">
+                Statut
+              </label>
+              <select
+                id="filter-status"
+                class="input input--select"
+                aria-label="Filtrer par statut"
+              >
+                <option value="">Tous les statuts</option>
+                <option value="pending">À faire</option>
+                <option value="completed">Terminées</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Form Ajout Tâche (caché par défaut) -->
+          <form
+            class="task-form"
+            id="task-form"
+            hidden
+            aria-label="Formulaire d'ajout de tâche"
+          >
+            <div class="form-group">
+              <label for="task-title" class="label">Titre de la tâche</label>
+              <input
+                type="text"
+                id="task-title"
+                class="input input--text"
+                placeholder="Décrivez votre tâche..."
+                required
+                maxlength="100"
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="task-category" class="label">Catégorie</label>
+                <select
+                  id="task-category"
+                  class="input input--select"
+                  required
+                  aria-label="Sélectionner une catégorie"
+                >
+                  <option value="">-- Choisir une catégorie --</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="task-deadline" class="label">Date d'échéance</label>
+                <input
+                  type="date"
+                  id="task-deadline"
+                  class="input input--date"
+                  aria-label="Sélectionner une date d'échéance"
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn--primary">
+                Créer la tâche
+              </button>
+              <button
+                type="button"
+                class="btn btn--secondary"
+                id="cancel-task-btn"
+              >
+                Annuler
+              </button>
+            </div>
+          </form>
+
+          <!-- Liste des Tâches -->
+          <div class="tasks-list" id="tasks-list" role="list">
+            <!-- Les tâches seront générées ici par JavaScript -->
+          </div>
+
+          <!-- Message vide -->
+          <div class="empty-state" id="empty-state" hidden>
+            <p class="empty-state__text">Aucune tâche pour le moment</p>
+            <p class="empty-state__hint">Créez votre première tâche en cliquant sur "+ Ajouter"</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
