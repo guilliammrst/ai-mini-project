@@ -4,7 +4,7 @@ Une application web moderne de gestion de tâches avec système de catégories, 
 
 ![Badge Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
 ![Badge License](https://img.shields.io/badge/license-MIT-blue)
-![Badge Version](https://img.shields.io/badge/version-1.3.0-blue)
+![Badge Version](https://img.shields.io/badge/version-1.4.0-blue)
 
 ---
 
@@ -35,12 +35,14 @@ Une application web moderne de gestion de tâches avec système de catégories, 
 - ✅ Récupération sécurisée des données
 
 ### 🎨 Design & Accessibilité
+- ✅ Layout Dashboard Desktop-First - Sidebar + Main content en Grid
 - ✅ Interface moderne avec gradient violet/bleu
-- ✅ Responsive mobile-first
+- ✅ Responsive avec graceful degradation (Desktop → Tablet → Mobile)
 - ✅ Support du mode sombre (prefers-color-scheme)
+- ✅ Hover effects au survol des éléments interactifs
 - ✅ Navigation au clavier complète
 - ✅ Labels ARIA et descriptions sémantiques
-- ✅ Contraste de couleurs accessible
+- ✅ Contraste de couleurs accessible (WCAG AA)
 
 ---
 
@@ -367,4 +369,4 @@ Merci d'utiliser cette application TO-DO List. Vos retours et suggestions d'amé
 ---
 
 **Dernière mise à jour** : 27 février 2026  
-**Version stable** : 1.3.0
+**Version stable** : 1.4.0
