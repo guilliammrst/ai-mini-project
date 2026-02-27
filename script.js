@@ -63,6 +63,7 @@ const AppState = {
   filters: {
     category: "",
     status: "",
+    search: "",
   },
 
   addCategory(name, color) {
@@ -101,7 +102,7 @@ const AppState = {
       title,
       categoryId,
       deadline: deadline || null,
-      completed: false,
+      status: "todo",
       createdAt: new Date().toISOString(),
     };
     this.tasks.push(task);
@@ -126,10 +127,10 @@ const AppState = {
     }
   },
 
-  toggleTask(id) {
+  updateTaskStatus(id, newStatus) {
     const task = this.tasks.find((t) => t.id === id);
-    if (task) {
-      task.completed = !task.completed;
+    if (task && ["todo", "in-progress", "done"].includes(newStatus)) {
+      task.status = newStatus;
       StorageManager.saveTasks(this.tasks);
     }
     return task;
@@ -140,16 +141,18 @@ const AppState = {
       const categoryMatch =
         !this.filters.category || task.categoryId === this.filters.category;
       const statusMatch =
-        !this.filters.status ||
-        (this.filters.status === "completed" && task.completed) ||
-        (this.filters.status === "pending" && !task.completed);
-      return categoryMatch && statusMatch;
+        !this.filters.status || task.status === this.filters.status;
+      const searchMatch =
+        !this.filters.search ||
+        task.title.toLowerCase().includes(this.filters.search.toLowerCase());
+      return categoryMatch && statusMatch && searchMatch;
     });
   },
 
-  setFilters(category, status) {
+  setFilters(category, status, search) {
     this.filters.category = category;
     this.filters.status = status;
+    this.filters.search = search || this.filters.search;
   },
 };
 
@@ -302,6 +305,7 @@ const DOM = {
   emptyState: document.getElementById("empty-state"),
 
   // Filters
+  searchInput: document.getElementById("search-input"),
   filterCategory: document.getElementById("filter-category"),
   filterStatus: document.getElementById("filter-status"),
 
@@ -376,27 +380,36 @@ function renderTasks() {
   filteredTasks.forEach((task) => {
     const category = getCategoryById(task.categoryId);
     const taskEl = document.createElement("div");
-    taskEl.className = `task-item ${task.completed ? "task-item--completed" : ""}`;
+    taskEl.className = `task-item task-item--${task.status}`;
     taskEl.setAttribute("role", "listitem");
 
+    const isOverdueTask = isOverdue(task.deadline) && task.status !== "done";
     const deadlineHtml = task.deadline
       ? `
-        <div class="task-meta-item ${isOverdue(task.deadline) && !task.completed ? "overdue" : ""}">
+        <div class="task-meta-item ${isOverdueTask ? "overdue" : ""}">
           📅 ${formatDate(task.deadline)}
-          ${isOverdue(task.deadline) && !task.completed ? "<span> (Dépassée)</span>" : ""}
+          ${isOverdueTask ? "<span> (Dépassée)</span>" : ""}
         </div>
       `
       : "";
 
+    const statusLabels = {
+      todo: "À faire",
+      "in-progress": "En cours",
+      done: "Terminée",
+    };
+
     taskEl.innerHTML = `
-      <input 
-        type="checkbox" 
-        class="task-checkbox" 
-        data-action="toggle-task" 
+      <select 
+        class="task-status-select" 
+        data-action="change-task-status" 
         data-id="${task.id}"
-        ${task.completed ? "checked" : ""}
-        aria-label="Marquer comme ${task.completed ? "à faire" : "terminée"}: ${task.title}"
-      />
+        aria-label="Changer le statut de la tâche: ${task.title}"
+      >
+        <option value="todo">À faire</option>
+        <option value="in-progress">En cours</option>
+        <option value="done">Terminée</option>
+      </select>
       <div class="task-content">
         <div class="task-title">${escapeHtml(task.title)}</div>
         <div class="task-meta">
@@ -409,6 +422,11 @@ function renderTasks() {
         <button class="task-btn task-btn--delete" data-action="delete-task" data-id="${task.id}" aria-label="Supprimer la tâche">✕</button>
       </div>
     `;
+
+    // Set the current status in the select
+    const selectEl = taskEl.querySelector(".task-status-select");
+    selectEl.value = task.status;
+
     DOM.tasksList.appendChild(taskEl);
   });
 }
@@ -421,8 +439,8 @@ function renderUI() {
 
 function updateProgressBar() {
   const totalTasks = AppState.tasks.length;
-  const completedTasks = AppState.tasks.filter((t) => t.completed).length;
-  const percentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+  const doneTasks = AppState.tasks.filter((t) => t.status === "done").length;
+  const percentage = totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
 
   const progressBar = document.getElementById("progress-bar");
   const progressText = document.getElementById("progress-text");
@@ -541,16 +559,25 @@ function handleTaskAction(action, id) {
         renderUI();
       }
     }
-  } else if (action === "toggle-task") {
-    AppState.toggleTask(id);
-    renderUI();
   }
+}
+
+function handleTaskStatusChange(id, newStatus) {
+  AppState.updateTaskStatus(id, newStatus);
+  renderUI();
 }
 
 function handleFilterChange() {
   const category = DOM.filterCategory.value;
   const status = DOM.filterStatus.value;
-  AppState.setFilters(category, status);
+  const search = DOM.searchInput.value;
+  AppState.setFilters(category, status, search);
+  renderTasks();
+}
+
+function handleSearchInput(e) {
+  const search = e.target.value;
+  AppState.filters.search = search;
   renderTasks();
 }
 
@@ -579,9 +606,9 @@ document.addEventListener("click", (e) => {
 document.addEventListener("change", (e) => {
   const target = e.target;
 
-  // Task checkbox
-  if (target.dataset.action === "toggle-task") {
-    handleTaskAction("toggle-task", target.dataset.id);
+  // Task status change
+  if (target.dataset.action === "change-task-status") {
+    handleTaskStatusChange(target.dataset.id, target.value);
   }
 
   // Filters
@@ -589,6 +616,11 @@ document.addEventListener("change", (e) => {
     handleFilterChange();
   }
 });
+
+// Search input listener (input event for real-time search)
+if (DOM.searchInput) {
+  DOM.searchInput.addEventListener("input", handleSearchInput);
+}
 
 // ========================================
 // UTILITY: HTML ESCAPE
@@ -639,6 +671,9 @@ function init() {
   }
   if (AppState.filters.status) {
     DOM.filterStatus.value = AppState.filters.status;
+  }
+  if (AppState.filters.search) {
+    DOM.searchInput.value = AppState.filters.search;
   }
 }
 

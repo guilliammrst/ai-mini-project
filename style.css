@@ -404,7 +404,7 @@ body {
 
 .filters {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
@@ -415,9 +415,16 @@ body {
 
 @media (min-width: 640px) {
   .filters {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
     padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .filters {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
   }
 }
 
@@ -452,22 +459,57 @@ body {
   border-color: #d1d5db;
 }
 
-.task-item--completed {
-  opacity: 0.7;
+.task-item--todo {
+  border-left: 4px solid #f97316;
 }
 
-.task-item--completed .task-title {
+.task-item--in-progress {
+  border-left: 4px solid #3b82f6;
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.02) 0%, transparent 100%);
+}
+
+.task-item--done {
+  opacity: 0.7;
+  border-left: 4px solid #22c55e;
+}
+
+.task-item--done .task-title {
   text-decoration: line-through;
   color: #9ca3af;
 }
 
 .task-checkbox {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  margin-top: 0.2rem;
+  display: none;
+}
+
+.task-status-select {
+  flex-shrink: 0;
+  width: 120px;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  accent-color: #667eea;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1em;
+  padding-right: 2rem;
+}
+
+.task-status-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.task-status-select option {
+  padding: 0.5rem;
 }
 
 .task-content {

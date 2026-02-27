@@ -126,6 +126,19 @@
           <!-- Filtres -->
           <div class="filters" role="group" aria-label="Filtres des tâches">
             <div class="filter-group">
+              <label for="search-input" class="label label--small">
+                Recherche
+              </label>
+              <input
+                type="search"
+                id="search-input"
+                class="input input--text"
+                placeholder="Rechercher une tâche..."
+                aria-label="Rechercher dans les tâches"
+              />
+            </div>
+
+            <div class="filter-group">
               <label for="filter-category" class="label label--small">
                 Catégorie
               </label>
@@ -148,8 +161,9 @@
                 aria-label="Filtrer par statut"
               >
                 <option value="">Tous les statuts</option>
-                <option value="pending">À faire</option>
-                <option value="completed">Terminées</option>
+                <option value="todo">À faire</option>
+                <option value="in-progress">En cours</option>
+                <option value="done">Terminées</option>
               </select>
             </div>
           </div>
