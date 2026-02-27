@@ -345,11 +345,13 @@ python -m http.server 8000
 # Rafraîchissez simplement la page (Ctrl+R ou Cmd+R)
 ```
 
-### Architecture des Tests (Futur)
-```bash
-npm install --save-dev jest @testing-library/dom
-npm run test
-```
+### 🧪 Tester avec des données d'exemple
+
+Pour découvrir rapidement l'interface et les fonctionnalités (filtres, statuts, barre de progression) sans avoir à tout saisir manuellement, un jeu de données de test est fourni avec le projet :
+
+1. Dans l'application, cliquez sur le bouton d'**Importation** (sauvegarde).
+2. Sélectionnez le fichier `import-tasks.json` situé à la racine du dossier.
+3. Le tableau de bord se mettra à jour instantanément avec des catégories et des tâches pré-configurées !
 
 ---
 

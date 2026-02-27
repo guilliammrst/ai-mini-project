@@ -1,0 +1,70 @@
+{
+  "categories": [
+    {
+      "id": "1800000000001",
+      "name": "Projet Dev",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "1800000000002",
+      "name": "Personnel",
+      "color": "#10b981"
+    },
+    {
+      "id": "1800000000003",
+      "name": "Maison",
+      "color": "#f59e0b"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "1800000000101",
+      "title": "Finaliser le design Web-First",
+      "categoryId": "1800000000001",
+      "deadline": "2026-03-01",
+      "status": "in-progress",
+      "createdAt": "2026-02-27T10:00:00.000Z"
+    },
+    {
+      "id": "1800000000102",
+      "title": "Implémenter la recherche textuelle",
+      "categoryId": "1800000000001",
+      "deadline": "2026-02-28",
+      "status": "done",
+      "createdAt": "2026-02-27T09:30:00.000Z"
+    },
+    {
+      "id": "1800000000103",
+      "title": "Aller courir 5km",
+      "categoryId": "1800000000002",
+      "deadline": "2026-03-02",
+      "status": "todo",
+      "createdAt": "2026-02-27T10:15:00.000Z"
+    },
+    {
+      "id": "1800000000104",
+      "title": "Ranger le bureau",
+      "categoryId": "1800000000003",
+      "deadline": "2026-02-27",
+      "status": "in-progress",
+      "createdAt": "2026-02-27T08:00:00.000Z"
+    },
+    {
+      "id": "1800000000105",
+      "title": "Acheter du café en grains",
+      "categoryId": "1800000000003",
+      "deadline": "2026-03-05",
+      "status": "todo",
+      "createdAt": "2026-02-27T10:20:00.000Z"
+    },
+    {
+      "id": "1800000000106",
+      "title": "Pousser la v1.4.0 sur GitHub",
+      "categoryId": "1800000000001",
+      "deadline": "2026-03-03",
+      "status": "todo",
+      "createdAt": "2026-02-27T10:25:00.000Z"
+    }
+  ],
+  "exportedAt": "2026-02-27T10:30:00.000Z"
+}
