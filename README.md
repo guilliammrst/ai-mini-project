@@ -4,7 +4,7 @@ Une application web moderne de gestion de tâches avec système de catégories, 
 
 ![Badge Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
 ![Badge License](https://img.shields.io/badge/license-MIT-blue)
-![Badge Version](https://img.shields.io/badge/version-1.5.0-blue)
+![Badge Version](https://img.shields.io/badge/version-1.5.1-blue)
 
 ---
 
@@ -373,4 +373,4 @@ Merci d'utiliser cette application TO-DO List. Vos retours et suggestions d'amé
 ---
 
 **Dernière mise à jour** : 27 février 2026  
-**Version stable** : 1.5.0
+**Version stable** : 1.5.1
